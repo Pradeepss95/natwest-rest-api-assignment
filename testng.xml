@@ -1,8 +1,7 @@
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Test Suite">
-    <test name="Cucumber Tests - Objects">
+    <test name="Cucumber Tests">
         <classes>
-            <class name="org.example.restapitest.runner.ObjectTestRunner"/>
+            <class name="org.example.restapitest.runner.TestRunnerObjectFeature"/>
         </classes>
     </test>
 </suite>

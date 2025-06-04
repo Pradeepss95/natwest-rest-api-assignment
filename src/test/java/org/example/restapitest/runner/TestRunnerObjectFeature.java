@@ -8,7 +8,7 @@ import org.testng.annotations.DataProvider;
         glue = "org/example/restapitest/stepdefinitions",
         features = "src/test/resources/features")
 
-public class ObjectTestRunner extends AbstractTestNGCucumberTests {
+public class TestRunnerObjectFeature extends AbstractTestNGCucumberTests {
     @Override
     @DataProvider(parallel = true)
     public Object[][] scenarios() {
