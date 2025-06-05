@@ -17,6 +17,7 @@
     <testng.version>6.14.3</testng.version>
     <surefire.version>2.22.0</surefire.version>
     <restassured.version>5.5.5</restassured.version>
+    <lombok.version>1.18.38</lombok.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
@@ -54,6 +55,12 @@
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
       <version>${restassured.version}</version>
+    </dependency>
+    <!-- Maven dependency for Lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
     </dependency>
   </dependencies>
   <build>

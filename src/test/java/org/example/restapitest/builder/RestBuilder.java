@@ -1,4 +1,4 @@
-package org.example.restapitest.utilities;
+package org.example.restapitest.builder;
 
 
 import io.restassured.RestAssured;
@@ -110,4 +110,12 @@ public class RestBuilder {
         return this.response;
     }
 
+    /**
+     * Gets the last Response Body of the request
+     *
+     * @return Response Body of API
+     */
+    public String getLastResponseBody() {
+        return this.response.body().asString();
+    }
 }
