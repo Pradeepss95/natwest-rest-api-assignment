@@ -1,4 +1,4 @@
-package org.example.restapitest.utilities;
+package org.example.restapitest.builder;
 
 
 import io.restassured.RestAssured;
@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 import java.util.Map;
 
 @Component
@@ -110,4 +111,12 @@ public class RestBuilder {
         return this.response;
     }
 
+    /**
+     * Gets the last Response Body of the request
+     *
+     * @return Response Body of API
+     */
+    public String getLastResponseBody() {
+        return this.response.body().asString();
+    }
 }
