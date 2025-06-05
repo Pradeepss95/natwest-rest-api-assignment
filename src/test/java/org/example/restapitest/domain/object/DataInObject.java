@@ -18,5 +18,11 @@ public class DataInObject {
     private String cpuModel;
     @JsonProperty("Hard disk size")
     private String hardDiskSize;
+    @JsonProperty("generation")
+    private String generation;
+    @JsonProperty("color")
+    private String color;
+    @JsonProperty("capacity")
+    private String capacity;
 
 }

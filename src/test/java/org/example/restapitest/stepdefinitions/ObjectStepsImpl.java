@@ -7,9 +7,11 @@ import io.restassured.http.ContentType;
 import org.example.restapitest.builder.RestBuilder;
 import org.example.restapitest.domain.object.DataInObject;
 import org.example.restapitest.domain.object.ObjectItem;
+import org.example.restapitest.utilities.FileUtility;
 import org.example.restapitest.utilities.ObjectMapperBean;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +37,35 @@ public class ObjectStepsImpl {
     @Autowired
     ObjectMapperBean objectMapperBean;
 
+    @Autowired
+    FileUtility fileUtility;
+
     private final String baseURI = "https://api.restful-api.dev/objects";
 
+    private final String testDatafilePath = "src/test/resources/Data/ObjectItem/";
+
+    @Given("^object item \"(.*)\"to be added$")
+    public void createObjectFromTestData(String fileName) {
+        //Read the data from file path.
+        String filePath = testDatafilePath + fileName + ".json";
+        final String requestData = fileUtility.getDataFromFile(filePath);
+        objectItem = objectMapperBean.convertStringToObjectItem(requestData);
+        logger.log(Level.INFO, "Item to be added is ready for creation");
+    }
+
+    @Given("^an object \"(.*)\" is invalid$")
+    public void createInvalidObjectFromTestData(String fileName) {
+        String requestData;
+        if ("EmptyObject".equalsIgnoreCase(fileName)){
+            requestData = "{}";
+        }else{
+            //Read the data from file path.
+            String filePath = testDatafilePath + fileName + ".json";
+            requestData = fileUtility.getDataFromFile(filePath);
+        }
+        restBuilder.withBody(requestData);
+        logger.log(Level.INFO, "Invalid Item to be added is ready for creation: {0}", requestData);
+    }
 
     @Given("^an object \"(.*)\" to be added$")
     public void createObject(String itemName) {
@@ -61,6 +90,12 @@ public class ObjectStepsImpl {
         logger.log(Level.INFO, "Request is sent to Add Object");
     }
 
+    @When("^the API request is sent to add invalid object$")
+    public void requestToAddInvalid() {
+        restBuilder.withBaseUri(baseURI).withHeader(createHeader()).invokePOSTMethod();
+        logger.log(Level.INFO, "Request is sent to Add Object");
+    }
+
 
     @When("^the API request is sent to get all the objects$")
     public void requestToGetAllObjects() {
@@ -71,9 +106,9 @@ public class ObjectStepsImpl {
     @When("^a (\\d+) response code is returned$")
     public void responseStatus(int expectedStatusCode) {
         final int responseStatusCode = restBuilder.getLastResponse().statusCode();
-        Assert.assertEquals(responseStatusCode, expectedStatusCode);
-        logger.log(Level.INFO, "Status is 200:OK");
+        logger.log(Level.INFO, "Status is: {0}", responseStatusCode);
         logger.log(Level.INFO, "Response Body is: {0}" + restBuilder.getLastResponseBody());
+        Assert.assertEquals(responseStatusCode, expectedStatusCode);
     }
 
     @And("^response should have the object added with created date time$")
@@ -103,6 +138,11 @@ public class ObjectStepsImpl {
         JSONArray responseItems = new JSONArray(lastResponseBody);
         logger.log(Level.INFO, "Number of Objects Returned is: " + responseItems.length());
         Assert.assertTrue(responseItems.length() > 1, "Response got less than or equals to 1 Object Item");
+        //This just for demo purpose and not recommended to use
+        for(int i = 0; i < responseItems.length(); i++){
+            JSONObject objectItem = responseItems.getJSONObject(i);
+            logger.log(Level.INFO, "Object Name retrieved from Objects is: {0}", objectItem.get("name"));
+        }
     }
 
     @When("^the API request is sent to get \"(.*)\" object$")
