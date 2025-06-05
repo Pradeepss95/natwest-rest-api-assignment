@@ -107,7 +107,7 @@ public class ObjectStepsImpl {
 
     @When("^the API request is sent to get \"(.*)\" object$")
     public void getObjectByID(String flagValue) {
-        String idCreated = null;
+        String idCreated;
         if ("added".equalsIgnoreCase(flagValue)){
             final String lastResponseBody = restBuilder.getLastResponseBody();
             Assert.assertNotNull(lastResponseBody, "Response Body is Null");
