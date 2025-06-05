@@ -2,10 +2,12 @@ package org.example.restapitest.domain.object;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
+@NoArgsConstructor
 public class DataInObject {
 
     @JsonProperty("year")

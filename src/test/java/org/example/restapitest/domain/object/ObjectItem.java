@@ -2,10 +2,14 @@ package org.example.restapitest.domain.object;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.time.OffsetDateTime;
 
 @Data
 @Component
+@NoArgsConstructor
 public class ObjectItem {
 
     @JsonProperty("id")
@@ -13,6 +17,9 @@ public class ObjectItem {
 
     @JsonProperty("name")
     private String name;
+
+    @JsonProperty("createdAt")
+    private OffsetDateTime createdAt;
 
     @JsonProperty("data")
     private DataInObject dataInObject;
