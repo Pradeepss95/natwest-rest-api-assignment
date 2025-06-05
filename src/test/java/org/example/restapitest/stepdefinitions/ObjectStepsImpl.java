@@ -14,7 +14,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.Assert;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -35,7 +34,7 @@ public class ObjectStepsImpl {
     @Autowired
     ObjectMapperBean objectMapperBean;
 
-    String baseURI = "https://api.restful-api.dev/objects";
+    private final String baseURI = "https://api.restful-api.dev/objects";
 
 
     @Given("^an object \"(.*)\" to be added$")
@@ -45,14 +44,13 @@ public class ObjectStepsImpl {
     }
 
     @And("^object has \"(.*)\" as CPU model and price ([0-9]+\\.[0-9]+)$")
-    public void addCPUModel(String cpuModel, double price) {
+    public void addCPUModelPrice(String cpuModel, double price) {
         DataInObject dataInObject = new DataInObject();
         dataInObject.setCpuModel(cpuModel);
         dataInObject.setPrice(price);
         objectItem.setDataInObject(dataInObject);
         logger.log(Level.INFO, "Data added to item");
     }
-
 
     @When("^the API request is sent to add the object$")
     public void requestToAdd() {
@@ -65,7 +63,7 @@ public class ObjectStepsImpl {
 
     @When("^the API request is sent to get all the objects$")
     public void requestToGetAllObjects() {
-        restBuilder.withBaseUri("https://api.restful-api.dev/objects").invokeGETMethod();
+        restBuilder.withBaseUri(baseURI).invokeGETMethod();
         logger.log(Level.INFO, "Request is sent to Get All Object");
     }
 
@@ -106,19 +104,26 @@ public class ObjectStepsImpl {
         Assert.assertTrue(responseItems.length() > 1, "Response got less than or equals to 1 Object Item");
     }
 
-    @When("^the API request is sent to get the added object$")
-    public void getAddedObject() {
-        final String lastResponseBody = restBuilder.getLastResponseBody();
-        Assert.assertNotNull(lastResponseBody, "Response Body is Null");
-        ObjectItem requestResponseObject = objectMapperBean.convertStringToObjectItem(lastResponseBody);
-        final String idCreated = requestResponseObject.getId();
-        objectItem.setId(idCreated);
-        String newBaseURI = baseURI + "/" + requestResponseObject.getId();
+    @When("^the API request is sent to get \"(.*)\" object$")
+    public void getObjectByID(String flagValue) {
+        String idCreated = null;
+        if ("added".equalsIgnoreCase(flagValue)){
+            final String lastResponseBody = restBuilder.getLastResponseBody();
+            Assert.assertNotNull(lastResponseBody, "Response Body is Null");
+            ObjectItem requestResponseObject = objectMapperBean.convertStringToObjectItem(lastResponseBody);
+            idCreated = requestResponseObject.getId();
+            objectItem.setId(idCreated);
+        }else {
+            idCreated = objectItem.getId();
+        }
+        Assert.assertNotNull(idCreated,"Id Fetched is null");
+        String newBaseURI = baseURI + "/" + idCreated;
         restBuilder.withBaseUri(newBaseURI).invokeGETMethod();
+        logger.log(Level.INFO, "Request sent to get Object Item by ID: {0}", idCreated);
     }
 
     @And("^added object is retrieved$")
-    public void getAddedObjectById() throws JSONException {
+    public void verifyAddedObjectById() throws JSONException {
         final String lastResponseBody = restBuilder.getLastResponseBody();
         Assert.assertNotNull(lastResponseBody, "Response Body is Null");
         //This is to demonstrate how Json Asser Can be used to compare two JSONs
@@ -127,11 +132,38 @@ public class ObjectStepsImpl {
         logger.log(Level.INFO, "ObjectItem retrieved matches with objectItem added");
     }
 
+    @When("^the API request is sent to delete the added Object Item$")
+    public void deleteObject() {
+        String id = getIDFromResponse();
+        Assert.assertNotNull(id,"ID from Response is NULL");
+        objectItem.setId(id);
+        String newBaseURI = baseURI + "/" + id;
+        restBuilder.withBaseUri(newBaseURI).invokeDeleteMethod();
+        logger.log(Level.INFO, "Request sent to Delete Item with ID : {0}", id);
+    }
 
+
+    /**
+     * Sets up the header for the request
+     * @return header
+     */
     private Map<String, Object> createHeader() {
         HashMap<String, Object> header = new HashMap<>();
         header.put("Content-Type", ContentType.JSON);
         return header;
+    }
+
+    /**
+     * Gets the id from Response and set it to Object Item
+     * @return id created
+     */
+    private String getIDFromResponse(){
+        final String lastResponseBody = restBuilder.getLastResponseBody();
+        Assert.assertNotNull(lastResponseBody, "Response Body is Null");
+        ObjectItem requestResponseObject = objectMapperBean.convertStringToObjectItem(lastResponseBody);
+        final String idCreated = requestResponseObject.getId();
+        logger.log(Level.INFO, "Id from the Response is: {0}", idCreated);
+        return idCreated;
     }
 
 }
