@@ -1,6 +1,5 @@
 package org.example.restapitest.stepdefinitions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
@@ -11,6 +10,8 @@ import org.example.restapitest.domain.object.ObjectItem;
 import org.example.restapitest.utilities.ObjectMapperBean;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.Assert;
 
@@ -54,8 +55,8 @@ public class ObjectStepsImpl {
 
 
     @When("^the API request is sent to add the object$")
-    public void requestToAdd() throws JsonProcessingException {
-        final String apiBody = objectMapperBean.objectMapper.writeValueAsString(objectItem);
+    public void requestToAdd() {
+        final String apiBody = objectMapperBean.convertToString(objectItem);
         logger.log(Level.INFO, "Request Body: {0}", apiBody);
         restBuilder.withBaseUri(baseURI).withHeader(createHeader()).withBody(apiBody).invokePOSTMethod();
         logger.log(Level.INFO, "Request is sent to Add Object");
@@ -77,10 +78,10 @@ public class ObjectStepsImpl {
     }
 
     @And("^response should have the object added with created date time$")
-    public void responseHadAddedObject() throws JsonProcessingException {
+    public void responseHadAddedObject() {
         final String lastResponseBody = restBuilder.getLastResponseBody();
         Assert.assertNotNull(lastResponseBody, "Response Body is Null");
-        ObjectItem requestResponseObject = objectMapperBean.objectMapper.readValue(lastResponseBody, ObjectItem.class);
+        ObjectItem requestResponseObject = objectMapperBean.convertStringToObjectItem(lastResponseBody);
         //Validate Name is correct
         String nameInResponse = requestResponseObject.getName();
         String nameInRequest = objectItem.getName();
@@ -104,6 +105,28 @@ public class ObjectStepsImpl {
         logger.log(Level.INFO, "Number of Objects Returned is: " + responseItems.length());
         Assert.assertTrue(responseItems.length() > 1, "Response got less than or equals to 1 Object Item");
     }
+
+    @When("^the API request is sent to get the added object$")
+    public void getAddedObject() {
+        final String lastResponseBody = restBuilder.getLastResponseBody();
+        Assert.assertNotNull(lastResponseBody, "Response Body is Null");
+        ObjectItem requestResponseObject = objectMapperBean.convertStringToObjectItem(lastResponseBody);
+        final String idCreated = requestResponseObject.getId();
+        objectItem.setId(idCreated);
+        String newBaseURI = baseURI + "/" + requestResponseObject.getId();
+        restBuilder.withBaseUri(newBaseURI).invokeGETMethod();
+    }
+
+    @And("^added object is retrieved$")
+    public void getAddedObjectById() throws JSONException {
+        final String lastResponseBody = restBuilder.getLastResponseBody();
+        Assert.assertNotNull(lastResponseBody, "Response Body is Null");
+        //This is to demonstrate how Json Asser Can be used to compare two JSONs
+        final String expectedObjectItem = objectMapperBean.convertToString(objectItem);
+        JSONAssert.assertEquals(expectedObjectItem, lastResponseBody, JSONCompareMode.STRICT);
+        logger.log(Level.INFO, "ObjectItem retrieved matches with objectItem added");
+    }
+
 
     private Map<String, Object> createHeader() {
         HashMap<String, Object> header = new HashMap<>();
