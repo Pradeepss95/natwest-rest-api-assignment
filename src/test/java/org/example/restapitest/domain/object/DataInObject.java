@@ -1,13 +1,15 @@
 package org.example.restapitest.domain.object;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.cucumber.spring.ScenarioScope;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@NoArgsConstructor
+@Scope("cucumber-glue")
 public class DataInObject {
 
     @JsonProperty("year")
