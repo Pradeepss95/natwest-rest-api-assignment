@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.testng.Assert;
 
 import java.util.HashMap;
@@ -40,7 +41,8 @@ public class ObjectStepsImpl {
     @Autowired
     FileUtility fileUtility;
 
-    private final String baseURI = "https://api.restful-api.dev/objects";
+    @Value("${objectItemAPI.baseUri}")
+    private String baseURI;
 
     private final String testDatafilePath = "src/test/resources/Data/ObjectItem/";
 

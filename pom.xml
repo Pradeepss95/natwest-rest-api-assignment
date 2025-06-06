@@ -32,6 +32,12 @@
         <groupId>io.cucumber</groupId>
         <artifactId>cucumber-testng</artifactId>
         <version>${cucumber.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     <!--Maven dependency for Spring boot-->
     <dependency>

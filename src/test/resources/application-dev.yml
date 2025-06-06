@@ -1,0 +1,7 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+objectItemAPI:
+  baseUri: "https://api.restful-api.dev/objects"
